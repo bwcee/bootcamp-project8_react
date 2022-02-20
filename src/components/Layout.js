@@ -1,11 +1,5 @@
-import { useState, useEffect } from "react";
-import {
-  AppBar,
-  Drawer,
-  makeStyles,
-  Toolbar,
-} from "@material-ui/core";
-import axios from "axios";
+import { AppBar, Drawer, makeStyles, Toolbar } from "@material-ui/core";
+import DrawerList from "./DrawerList";
 
 const drawerWidth = 220;
 
@@ -37,39 +31,43 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-
-function Layout({ children }) {
+function Layout({ children, userAddress, userDetails, setUserDetails }) {
   const classes = useStyles();
 
   return (
-       <div className={classes.root}>
-        <AppBar position="fixed" className={classes.appbar} elevation={0}>
-          <Toolbar>
-            <p>
-              Today is{" "}
-              {new Date().toLocaleDateString("en-GB", { dateStyle: "long" })}
-            </p>
-          </Toolbar>
-        </AppBar>
+    <div className={classes.root}>
+      <AppBar position="fixed" className={classes.appbar} elevation={0}>
+        <Toolbar>
+          <p>
+            Today is{" "}
+            {new Date().toLocaleDateString("en-GB", { dateStyle: "long" })}
+          </p>
+        </Toolbar>
+      </AppBar>
 
-        <Drawer
-          className={classes.drawer}
-          variant="permanent"
-          classes={{ paper: classes.drawerPaper }}
-          anchor="left"
-        >
-          <div>
-            <h4 className={classes.title}> Menu sidebar</h4>
-          </div>
-        </Drawer>
-
-        {/* main contents */}
-        <div className={classes.page}>
-          <div className={classes.toolbar}></div>
-          {children}
+      <Drawer
+        className={classes.drawer}
+        variant="permanent"
+        classes={{ paper: classes.drawerPaper }}
+        anchor="left"
+      >
+        <div>
+          <h4 className={classes.title}> Menu sidebar</h4>
         </div>
+        <DrawerList
+          userAddress={userAddress}
+          userDetails={userDetails}
+          setUserDetails={setUserDetails}
+        />
+      </Drawer>
+
+      {/* main contents */}
+      <div className={classes.page}>
+        <div className={classes.toolbar}></div>
+        {children}
       </div>
+    </div>
   );
 }
 
-export default Layout
+export default Layout;
