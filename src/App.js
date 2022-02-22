@@ -67,6 +67,7 @@ function App() {
               userAddress={userAddress}
               userDetails={userDetails}
               setUserDetails={setUserDetails}
+              signer={signer}
             />
           </Route>
           <Route path="/*/*">
