@@ -31,7 +31,14 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-function Layout({ children, userAddress, userDetails, setUserDetails }) {
+function Layout({
+  children,
+  userAddress,
+  userDetails,
+  setUserDetails,
+  mktListingContract,
+  nftContract,
+}) {
   const classes = useStyles();
 
   return (
@@ -58,6 +65,8 @@ function Layout({ children, userAddress, userDetails, setUserDetails }) {
           userAddress={userAddress}
           userDetails={userDetails}
           setUserDetails={setUserDetails}
+          mktListingContract={mktListingContract}
+          nftContract={nftContract}
         />
       </Drawer>
 

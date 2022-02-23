@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Layout from "./components/Layout";
 import LogIn from "./pages/LogIn";
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
+
 
 function App() {
   /* all 3 states below are set in LogIn component but placed here cos fig may need to use them in other components */
@@ -12,6 +13,9 @@ function App() {
   const [signer, setSigner] = useState();
   /* state below initialised in Home component, again placed here cos will need to use it in other components */
   const [userDetails, setUserDetails] = useState();
+  /* contracts placed in useRefs cos won't need to rerun app when they change since app is alr rerun when signer changes which will in turn update these useRefs*/
+  const mktListingContract = useRef();
+  const nftContract = useRef();
 
   /* 
   1. useEffect below detects changes in connected user/ network and reloads the page if so
@@ -61,6 +65,8 @@ function App() {
           userAddress={userAddress}
           userDetails={userDetails}
           setUserDetails={setUserDetails}
+          mktListingContract={mktListingContract}
+          nftContract={nftContract}
         >
           <Route exact path="/main">
             <Home
@@ -68,6 +74,8 @@ function App() {
               userDetails={userDetails}
               setUserDetails={setUserDetails}
               signer={signer}
+              mktListingContract={mktListingContract}
+              nftContract={nftContract}
             />
           </Route>
           <Route path="/*/*">

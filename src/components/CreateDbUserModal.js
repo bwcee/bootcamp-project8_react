@@ -40,8 +40,8 @@ const CreateDbUserModal = ({userAddress, setUserDetails}) => {
     evt.preventDefault();
     setUserNameInputErr(false);
     const input = userNameInput.current.value.toLowerCase();
-    if (input === "" ) {
-      alert("dude u ain't enter no nuthing");
+    if (input === "" || /[<>=@{};]/.test(input)) {
+      alert("dude u ain't enter no nuthing or entered illegal characters");
       setUserNameInputErr(true);
     } else {
       axios
@@ -62,7 +62,7 @@ const CreateDbUserModal = ({userAddress, setUserDetails}) => {
               required
               inputRef={userNameInput}
               color="secondary"
-              placeholder="any user name you like"
+              placeholder="any user name you like, <>=@{}; characters not allowed"
               variant="outlined"
               className={classes.title}
               error={userNameInputErr}

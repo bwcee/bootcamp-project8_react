@@ -5,10 +5,16 @@ import CreateDbUserModal from "../components/CreateDbUserModal";
 /* for somme reason if try to place e 2 files below outside of src, get cannot find module error... see ""../contracts/WhyABIsHere.md" */
 import MarketListing from "../contracts/MarketListing.json";
 import NFT from "../contracts/NFT.json";
+import { mktAdd, nftAdd } from "../contracts/addressSetting.js";
 
-import {mktAdd, nftAdd} from "../contracts/addressSetting.js"
-
-function Home({ userAddress, userDetails, setUserDetails, signer }) {
+function Home({
+  userAddress,
+  userDetails,
+  setUserDetails,
+  signer,
+  mktListingContract,
+  nftContract,
+}) {
   const [allNfts, setAllNfts] = useState([]);
   useEffect(() => {
     const chkDb = async () => {
@@ -30,15 +36,15 @@ function Home({ userAddress, userDetails, setUserDetails, signer }) {
   Ref
   a. Connecting to a Contract (https://docs.ethers.io/v5/api/contract/example/#example-erc-20-contract--connecting-to-a-contract)
   */
-  const mktListingContract = new ethers.Contract(
+  mktListingContract.current = new ethers.Contract(
     mktAdd,
     MarketListing.abi,
     signer
   );
-  const nftContract = new ethers.Contract(nftAdd, NFT.abi, signer);
+  nftContract.current = new ethers.Contract(nftAdd, NFT.abi);
 
   const loadNFTs = async () => {
-    const nftsData = await mktListingContract.getAllMarketItems();
+    const nftsData = await mktListingContract.current.getAllMarketItems();
     /* nft.tokenUri() is function inherited from ERC721URIStorage, basically returns the Uri for a tokenId */
     const nftArr = await Promise.all(
       nftsData.map(async (nft) => {

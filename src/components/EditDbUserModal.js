@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-const EditDbUserModal = ({modal, setModal, userAddress, userDetails, setUserDetails}) => {
+const EditDbUserModal = ({editDbUsermodal, setEditDbUserModal, userAddress, userDetails, setUserDetails}) => {
   const classes = useStyles();
   const [changeInputErr, setChangeInputErr] = useState(false);
   const changeInput = useRef();
@@ -37,8 +37,8 @@ const EditDbUserModal = ({modal, setModal, userAddress, userDetails, setUserDeta
     evt.preventDefault();
     setChangeInputErr(false);
     const input = changeInput.current.value.toLowerCase();
-    if (input === "" ) {
-      alert("dude u ain't enter no nuthing");
+    if (input === "" || /[<>=@{};]/.test(input)) {
+      alert("dude u ain't enter no nuthing or entered illegal characters");
       setChangeInputErr(true);
     } else {
       axios
@@ -46,12 +46,12 @@ const EditDbUserModal = ({modal, setModal, userAddress, userDetails, setUserDeta
         .then((result) => {
           /* setUserDetails below so created db record can be used in Home component */
           setUserDetails(result.data)
-          setModal(false);
+          setEditDbUserModal(false);
         });
     }
   };
   return (
-      <Modal open={modal} onClose={()=>setModal(false)}>
+      <Modal open={editDbUsermodal} onClose={()=>setEditDbUserModal(false)}>
         <Box className={classes.modal}>
           <h3 className={classes.title}>Change user name</h3>
           <form noValidate autoComplete="off" onSubmit={doEdit}>
@@ -59,7 +59,7 @@ const EditDbUserModal = ({modal, setModal, userAddress, userDetails, setUserDeta
               required
               inputRef={changeInput}
               color="secondary"
-              placeholder="key in watever name you like to change to"
+              placeholder="key in watever name you like to change to, <>=@{}; not allowed"
               variant="outlined"
               className={classes.title}
               error={changeInputErr}
