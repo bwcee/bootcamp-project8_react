@@ -5,10 +5,13 @@
 ### Connecting to smart contracts
 
 1. follow instructions in solidity repo scripts/deploy.js to create local blockchain using hardhat and deploy contracts to local blockchain
+   - basically open one terminal and enter `npx hardhat node` to get a blockchain running locally
+   - open 2nd terminal and enter `npx hardhat run --network localhost scripts/deploy.js` to get the contracts deployed on local blockchain
 2. an artifacts folder will be created in solidity repo. copy MarketListing.json and NFT.json from the folder.
-3. paste MarketListing.json and NFT.json into this repo's src folder (this has already been done... but this step needs to be redone if MarketListing or NFT contracts change)
-4. the local blockchain comes w 20 accounts tt start w 10000 eth each. See [Building a Full Stack NFT Marketplace on Ethereum with Polygon](https://dev.to/dabit3/building-scalable-full-stack-apps-on-ethereum-with-polygon-2cfb) on how to link MetaMask to these accounts
-5. becos this is a local blockchain created by hardhat, think all accounts and addresses will be diff everytime the local blockchain is spun up...
+3. paste MarketListing.json and NFT.json into this repo's src/contracts folder (this has already been done... but this step needs to be redone if MarketListing or NFT contracts change)
+4. update addresses in "src/contracts/addressSetting.js"
+5. the local blockchain comes w 20 accounts tt start w 10000 eth each. See [Building a Full Stack NFT Marketplace on Ethereum with Polygon](https://dev.to/dabit3/building-scalable-full-stack-apps-on-ethereum-with-polygon-2cfb) on how to link MetaMask to these accounts
+6. becos this is a local blockchain created by hardhat, think all 20 accounts and addresses will be diff everytime the local blockchain is spun up... actually... just chked again... the account nbrs & private keys remain the same!
 
 ### Connecting to postgresql backend
 

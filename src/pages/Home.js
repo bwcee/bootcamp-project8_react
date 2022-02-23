@@ -2,15 +2,11 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import axios from "axios";
 import CreateDbUserModal from "../components/CreateDbUserModal";
-/* for somme reason if try to place e 2 files below outside of src, get cannot find module error... */
-import MarketListing from "../MarketListing.json";
-import NFT from "../NFT.json";
-/* 
-1. when using local blockchain network provided by hardhat, need to get the addresses below after contracts deployed locally... addresses will change w every deployment
-2. this is just here now for ease of testing... prob shift out to some config file at a later stage 
-*/
-const mktAdd = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const nftAdd = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+/* for somme reason if try to place e 2 files below outside of src, get cannot find module error... see ""../contracts/WhyABIsHere.md" */
+import MarketListing from "../contracts/MarketListing.json";
+import NFT from "../contracts/NFT.json";
+
+import {mktAdd, nftAdd} from "../contracts/addressSetting.js"
 
 function Home({ userAddress, userDetails, setUserDetails, signer }) {
   const [allNfts, setAllNfts] = useState([]);
