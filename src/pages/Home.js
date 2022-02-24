@@ -41,7 +41,7 @@ function Home({
     MarketListing.abi,
     signer
   );
-  nftContract.current = new ethers.Contract(nftAdd, NFT.abi);
+  nftContract.current = new ethers.Contract(nftAdd, NFT.abi, signer);
 
   const loadNFTs = async () => {
     const nftsData = await mktListingContract.current.getAllMarketItems();
@@ -53,7 +53,7 @@ function Home({
         let price = ethers.utils.formatUnits(nft.price.toString(), "ether");
         let singleNFT = {
           price,
-          tokenId: nft.tokenId.toNumber(),
+          tokenId: Number(nft.tokenId),
           seller: nft.seller,
           owner: nft.owner,
           // image: meta.data.image,
@@ -86,3 +86,26 @@ function Home({
 }
 
 export default Home;
+
+/* code below to retrieve data frm pinata needs to eventually be in Home.js */
+    /* 
+    base url to get bck pic: https://gateway.pinata.cloud/ipfs/
+    followed by the ipfsHash returned frm pinning it... 
+    https://gateway.pinata.cloud/ipfs/QmQpmHYPnKvrBqDUVzh5ocfRW2wktFdfXhcsFMwRKWA8Uz 
+    so for code below shld be
+    result.rows[0].pifs_pin_hash -> ipfs hash or CID to use above to retrieve pic
+    result.rows[0].metadata.name -> name given in nft name input
+    result.rows[0].metadata.keyvalues.description: description given in nft description input
+    */
+    // try {
+    //   const result = await axios.get(tokenUrl, {
+    //     headers: {
+    //       pinata_api_key: pinataKey,
+    //       pinata_secret_api_key: pinataSecret,
+    //     },
+    //   });
+    //   console.log("This is result from ipfs", result.data);
+    // } catch (err) {
+    //   alert("something went wrong with getting bck data frm ipfs");
+    //   console.log(err);
+    // }

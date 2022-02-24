@@ -50,15 +50,17 @@ const AddNftModal = ({
   nftContract,
 }) => {
   const classes = useStyles();
+  /* states to highlight errors in various inputs in AddNftModal */
   const [nameInputErr, setNameInputErr] = useState(false);
   const [descriptionInputErr, setDescriptionInputErr] = useState(false);
   const [priceInputErr, setPriceInputErr] = useState(false);
   const [fileInputErr, setFileInputErr] = useState(false);
+  /* useRefs to refer to e various inputs in AddNftModal */
   const nameInput = useRef();
   const descriptionInput = useRef();
   const priceInput = useRef();
   const fileInput = useRef();
-
+  /* need a .env file in root folder with info below */
   const pinataKey = process.env.REACT_APP_pinataKey;
   const pinataSecret = process.env.REACT_APP_pinataSecret;
 
@@ -88,7 +90,7 @@ const AddNftModal = ({
           pinata_secret_api_key: pinataSecret,
         },
       });
-      console.log("This is result from pinning", result);
+      // console.log("This is result from pinning", result);
       return result.data.IpfsHash;
     } catch (err) {
       alert("something went wrong with upload to IPFS");
@@ -97,16 +99,18 @@ const AddNftModal = ({
   };
 
   /* 
-  makeToken() and listToken() refs
+  1. frm ref b, contract.createToken() does not return a result, instead it returns a TransactionResponse which needs to be manipulated in order get desired result.    
+  Refs
   a. Building a Full Stack NFT Marketplace on Ethereum with Polygon (https://dev.to/dabit3/building-scalable-full-stack-apps-on-ethereum-with-polygon-2cfb)
+  b. (https://docs.ethers.io/v5/api/contract/contract/#contract-functionsSend)
   */
   const makeToken = async (tokenUrl) => {
     try {
-      let mintToken = nftContract.createToken(tokenUrl);
-      let mintTokenDone = await mintToken.wait();
-      let event = mintTokenDone.events[0];
-      let value = event.args[2];
-      return Number(value);
+      let transacResponse = await nftContract.current.createToken(tokenUrl);
+      let transacReceipt = await transacResponse.wait();
+      let mintToken = Number(transacReceipt.events[0].args[2]);
+      // console.log("This is result from minting token", mintToken);
+      return mintToken;
     } catch (err) {
       alert("something went wrong with minting the NFT");
       console.log(err);
@@ -115,12 +119,12 @@ const AddNftModal = ({
 
   const listToken = async (nftContract, tokenId, price) => {
     try {
-      let listingToken = await mktListingContract.createMarketItem(
+      await mktListingContract.current.createMarketItem(
         nftContract,
         tokenId,
         price
       );
-      await listingToken.wait();
+      return;
     } catch (err) {
       alert("something went wrong with listing the NFT in the marketplc");
       console.log(err);
@@ -129,17 +133,17 @@ const AddNftModal = ({
 
   const verifyCreateNftInputs = async (evt) => {
     evt.preventDefault();
+    /* getting hold of user inputs from AddNftModal */
     const name = nameInput.current.value.toLowerCase();
     const description = descriptionInput.current.value.toLowerCase();
-    let price = Number(priceInput.current.value);
+    const price = Number(priceInput.current.value);
     const file = fileInput.current.files[0];
-
     /* b4 verfifying inputs, set all error states to false */
     setNameInputErr(false);
     setDescriptionInputErr(false);
     setPriceInputErr(false);
     setFileInputErr(false);
-
+    /* verify all inputs */
     if (name === "" || /[<>=@{};]/.test(name)) {
       setNameInputErr(true);
       alert("nil name or illegal characs used");
@@ -163,27 +167,20 @@ const AddNftModal = ({
       alert("nil file or non-image file chosen");
       return;
     }
-
+    /* pin token using pinata api */
     const ipfsHash = await pinFile(file, name, description);
-    console.log("This is ipfsHash", ipfsHash);
+    /* pinata api endpoint to retrieve token data */
     const tokenUrl = `https://api.pinata.cloud/data/pinList?hashContains=${ipfsHash}`;
-    console.log("This is tokenUrl", tokenUrl);
-    try {
-      const result = await axios.get(tokenUrl, {
-        headers: {
-          pinata_api_key: pinataKey,
-          pinata_secret_api_key: pinataSecret,
-        },
-      });
-      console.log("This is result from ipfs", result.data);
-    } catch (err) {
-      alert("something went wrong with getting bck data frm ipfs");
-      console.log(err);
-    }
-
+    /* mint token on blockchain */
     const tokenId = await makeToken(tokenUrl);
-    price = ethers.utils.parseUnits(price, "ether");
-    await listToken(nftContract, tokenId, price);
+    /* not so sure if this part correct. cos when console.log parsedPrice is actually an object, altho the listing below still went thru... */
+    const parsedPrice = ethers.utils.parseUnits(price.toString(), "ether");
+    /* 
+    1. list minted token on blockchain market
+    2. to get hold of a contract address (https://docs.ethers.io/v5/api/contract/contract/#Contract--properties)
+    */
+    await listToken(nftContract.current.address, tokenId, parsedPrice);
+
     setAddNftModal(false);
   };
 
