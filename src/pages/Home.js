@@ -15,7 +15,13 @@ function Home({
   mktListingContract,
   nftContract,
 }) {
+  /* states to store all tokens retrieved from marketplc + token data frm pinata */
   const [allNfts, setAllNfts] = useState([]);
+  /* need a .env file in root folder with info below */
+  const pinataKey = process.env.REACT_APP_pinataKey;
+  const pinataSecret = process.env.REACT_APP_pinataSecret;
+  const pinataGatewayBase = process.env.REACT_APP_pinataGatewayBase;
+
   useEffect(() => {
     const chkDb = async () => {
       const result = await axios.get(`http://localhost:3004/${userAddress}`);
@@ -30,7 +36,7 @@ function Home({
   */
   useEffect(() => {
     loadNFTs();
-  }, []);
+  },[]);
   /* 
   1. think last param in Contract can be either provider or signer... passing in signer => signer can manipulate contract methods while if pass in provider, then contract only has read-only-access
   Ref
@@ -44,26 +50,44 @@ function Home({
   nftContract.current = new ethers.Contract(nftAdd, NFT.abi, signer);
 
   const loadNFTs = async () => {
-    const nftsData = await mktListingContract.current.getAllMarketItems();
-    /* nft.tokenUri() is function inherited from ERC721URIStorage, basically returns the Uri for a tokenId */
-    const nftArr = await Promise.all(
-      nftsData.map(async (nft) => {
-        // const tokenUri = await nft.tokenUri(nft.tokenId);
-        // const meta = await axios.get(tokenUri);
-        let price = ethers.utils.formatUnits(nft.price.toString(), "ether");
-        let singleNFT = {
-          price,
-          tokenId: Number(nft.tokenId),
-          seller: nft.seller,
-          owner: nft.owner,
-          // image: meta.data.image,
-          // name: meta.data.name,
-          // description: meta.data.description,
-        };
-        return singleNFT;
-      })
-    );
-    setAllNfts(nftArr);
+    try {
+      const nftsData = await mktListingContract.current.getAllMarketItems();
+      console.log("This is nftsData", nftsData);
+      /* nftContract.tokenURI() is function inherited from ERC721URIStorage, basically returns the Uri for a tokenId */
+      const nftArr = await Promise.all(
+        nftsData.map(async (nft) => {
+          const tokenUri = await nftContract.current.tokenURI(nft.tokenId);
+          console.log(
+            "tokenUri",
+            tokenUri,
+            "for this tokenId",
+            Number(nft.tokenId)
+          );
+          const tokenPinataData = await axios.get(tokenUri, {
+            headers: {
+              pinata_api_key: pinataKey,
+              pinata_secret_api_key: pinataSecret,
+            },
+          });
+
+          let price = ethers.utils.formatUnits(nft.price.toString(), "ether");
+          let singleNFT = {
+            price,
+            tokenId: Number(nft.tokenId),
+            seller: nft.seller,
+            owner: nft.owner,
+            image: `${pinataGatewayBase}${tokenPinataData.rows[0].ipfs_pin_hash}`, //this is pinata url to retrieve image
+            name: tokenPinataData.rows[0].metadata.name,
+            description: tokenPinataData.rows[0].metadata.keyvalues.description,
+          };
+          return singleNFT;
+        })
+      );
+      setAllNfts(nftArr);
+      console.log("This is allNfts", allNfts);
+    } catch (err) {
+      console.log("Something went wrong with retrieving nfts");
+    }
   };
 
   return (
@@ -86,26 +110,3 @@ function Home({
 }
 
 export default Home;
-
-/* code below to retrieve data frm pinata needs to eventually be in Home.js */
-    /* 
-    base url to get bck pic: https://gateway.pinata.cloud/ipfs/
-    followed by the ipfsHash returned frm pinning it... 
-    https://gateway.pinata.cloud/ipfs/QmQpmHYPnKvrBqDUVzh5ocfRW2wktFdfXhcsFMwRKWA8Uz 
-    so for code below shld be
-    result.rows[0].pifs_pin_hash -> ipfs hash or CID to use above to retrieve pic
-    result.rows[0].metadata.name -> name given in nft name input
-    result.rows[0].metadata.keyvalues.description: description given in nft description input
-    */
-    // try {
-    //   const result = await axios.get(tokenUrl, {
-    //     headers: {
-    //       pinata_api_key: pinataKey,
-    //       pinata_secret_api_key: pinataSecret,
-    //     },
-    //   });
-    //   console.log("This is result from ipfs", result.data);
-    // } catch (err) {
-    //   alert("something went wrong with getting bck data frm ipfs");
-    //   console.log(err);
-    // }

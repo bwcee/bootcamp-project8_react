@@ -108,7 +108,8 @@ const AddNftModal = ({
     try {
       let transacResponse = await nftContract.current.createToken(tokenUrl);
       let transacReceipt = await transacResponse.wait();
-      let mintToken = Number(transacReceipt.events[0].args[2]);
+      // console.log("mint token transacReceipt", transacReceipt, "tokenId",transacReceipt.events[0].args.tokenId)
+      let mintToken = transacReceipt.events[0].args.tokenId;
       // console.log("This is result from minting token", mintToken);
       return mintToken;
     } catch (err) {
@@ -118,6 +119,7 @@ const AddNftModal = ({
   };
 
   const listToken = async (nftContract, tokenId, price) => {
+    // console.log("These are args passed in", nftContract, tokenId, price)
     try {
       await mktListingContract.current.createMarketItem(
         nftContract,
@@ -182,6 +184,7 @@ const AddNftModal = ({
     await listToken(nftContract.current.address, tokenId, parsedPrice);
 
     setAddNftModal(false);
+    
   };
 
   return (
