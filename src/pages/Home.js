@@ -69,26 +69,28 @@ function Home({
               pinata_secret_api_key: pinataSecret,
             },
           });
-
+          
           let price = ethers.utils.formatUnits(nft.price.toString(), "ether");
           let singleNFT = {
             price,
             tokenId: Number(nft.tokenId),
             seller: nft.seller,
             owner: nft.owner,
-            image: `${pinataGatewayBase}${tokenPinataData.rows[0].ipfs_pin_hash}`, //this is pinata url to retrieve image
-            name: tokenPinataData.rows[0].metadata.name,
-            description: tokenPinataData.rows[0].metadata.keyvalues.description,
+            image: `${pinataGatewayBase}${tokenPinataData.data.rows[0].ipfs_pin_hash}`, //this is pinata url to retrieve image
+            name: tokenPinataData.data.rows[0].metadata.name,
+            description: tokenPinataData.data.rows[0].metadata.keyvalues.description,
           };
           return singleNFT;
         })
       );
       setAllNfts(nftArr);
-      console.log("This is allNfts", allNfts);
+      
     } catch (err) {
-      console.log("Something went wrong with retrieving nfts");
+      console.log("Something went wrong with retrieving nfts", err);
     }
   };
+
+  console.log("This is allNfts", allNfts);
 
   return (
     <div>

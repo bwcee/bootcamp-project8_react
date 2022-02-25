@@ -24,9 +24,9 @@
 
 ## Troubleshooting local hardhat blockchain issues
 
-### Errors related to artifacts folder when trying to deploy solidity contracts
+### Errors related to artifacts folder/ cache when trying to deploy solidity contracts
 
-1. it's safe to delete entire contents of artifacts folder in contracts repo and retry deployment again
+1. from the [docs](https://hardhat.org/guides/compile-contracts.html), run `npx hardhat clean` to clear the cache and delete the artifacts from before
 
 ### "Nonce too high..."
 
